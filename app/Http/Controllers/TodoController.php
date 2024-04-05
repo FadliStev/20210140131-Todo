@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TodoController extends Controller
 {
@@ -12,9 +13,11 @@ class TodoController extends Controller
      */
     public function index()
     {
-        $todos = Todo::where('user_id', auth()->user()->id)->get();
-        dd($todos);
-        return view('todo.index');
+        $todos = Todo::where('user_id', auth()->user()->id)
+        ->orderBy('is_complete', 'asc')
+        ->orderBy('created_at', 'desc')
+        ->get();
+        return view('todo.index', compact('todos'));
     }
 
     /**
@@ -28,9 +31,31 @@ class TodoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Todo $todo)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:255'
+        ]);
+
+        $todo = new Todo;
+        $todo->title = $request->title;
+        $todo->user_id = auth()->user()->id;
+        $todo->save();
+
+
+        DB::table('todos')->insert([
+            'title' => $request->title,
+            'user_id' =>auth()->user()->id,
+            'created_at' =>now(),
+            'updated_at' =>now(),
+
+        ]);
+        $todo = Todo::create([
+            'title' => ucfirst($request->title),
+            'user_id' => auth()->user()->id,
+        ]);
+
+        return redirect()->route('todo.index')->with('success', 'Todo Created Succcessfully!');
     }
 
     /**
