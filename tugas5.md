@@ -2,7 +2,7 @@
 
 ## 1. Todo Create
 
-![Alt text](screenshot/tugas5/TodoCreate.png)
+![Alt text](screenshoot/tugas5/TodoCreate.png)
 
 ## 2. Todo Created
 
